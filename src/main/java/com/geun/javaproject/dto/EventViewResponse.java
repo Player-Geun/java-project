@@ -4,9 +4,9 @@ import com.geun.javaproject.constant.EventStatus;
 
 import java.time.LocalDateTime;
 
-public record EventResponse(
+public record EventViewResponse(
         Long id,
-        PlaceDto place,
+        String placeName,
         String eventName,
         EventStatus eventStatus,
         LocalDateTime eventStartDatetime,
@@ -15,10 +15,9 @@ public record EventResponse(
         Integer capacity,
         String memo
 ) {
-
-    public static EventResponse of(
+    public EventViewResponse(
             Long id,
-            PlaceDto place,
+            String placeName,
             String eventName,
             EventStatus eventStatus,
             LocalDateTime eventStartDatetime,
@@ -27,9 +26,31 @@ public record EventResponse(
             Integer capacity,
             String memo
     ) {
-        return new EventResponse(
+        this.id = id;
+        this.placeName = placeName;
+        this.eventName = eventName;
+        this.eventStatus = eventStatus;
+        this.eventStartDatetime = eventStartDatetime;
+        this.eventEndDatetime = eventEndDatetime;
+        this.currentNumberOfPeople = currentNumberOfPeople;
+        this.capacity = capacity;
+        this.memo = memo;
+    }
+
+    public static EventViewResponse of(
+            Long id,
+            String placeName,
+            String eventName,
+            EventStatus eventStatus,
+            LocalDateTime eventStartDatetime,
+            LocalDateTime eventEndDatetime,
+            Integer currentNumberOfPeople,
+            Integer capacity,
+            String memo
+    ) {
+        return new EventViewResponse(
                 id,
-                place,
+                placeName,
                 eventName,
                 eventStatus,
                 eventStartDatetime,
@@ -40,11 +61,11 @@ public record EventResponse(
         );
     }
 
-    public static EventResponse from(EventDto eventDTO) {
+    public static EventViewResponse from(EventDto eventDTO) {
         if (eventDTO == null) { return null; }
-        return EventResponse.of(
+        return EventViewResponse.of(
                 eventDTO.id(),
-                eventDTO.placeDto(),
+                eventDTO.placeDto().placeName(),
                 eventDTO.eventName(),
                 eventDTO.eventStatus(),
                 eventDTO.eventStartDatetime(),
