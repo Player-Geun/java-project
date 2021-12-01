@@ -11,13 +11,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @ToString
-@EqualsAndHashCode
 @Table(indexes = {
-        @Index(columnList = "adminId"),
-        @Index(columnList = "placeId"),
         @Index(columnList = "createdAt"),
         @Index(columnList = "modifiedAt")
 })
@@ -25,19 +23,18 @@ import java.time.LocalDateTime;
 @Entity
 public class AdminPlaceMap {
 
-    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 
     @Setter
-    @Column(nullable = false)
-    private Long adminId;
+    @ManyToOne(optional = false)
+    private Admin admin;
 
     @Setter
-    @Column(nullable = false)
-    private Long placeId;
+    @ManyToOne(optional = false)
+    private Place place;
 
 
     @Column(nullable = false, insertable = false, updatable = false)
@@ -49,15 +46,28 @@ public class AdminPlaceMap {
     private LocalDateTime modifiedAt;
 
 
-    protected AdminPlaceMap() {
+    protected AdminPlaceMap() {}
+
+    protected AdminPlaceMap(Admin admin, Place place) {
+        this.admin = admin;
+        this.place = place;
     }
 
-    protected AdminPlaceMap(Long adminId, Long placeId) {
-        this.adminId = adminId;
-        this.placeId = placeId;
+    public static AdminPlaceMap of(Admin admin, Place place) {
+        return new AdminPlaceMap(admin, place);
     }
 
-    public static AdminPlaceMap of(Long adminId, Long placeId) {
-        return new AdminPlaceMap(adminId, placeId);
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        return id != null && id.equals(((AdminPlaceMap) obj).getId());
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(place, admin, createdAt, modifiedAt);
+    }
+
 }
