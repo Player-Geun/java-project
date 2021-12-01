@@ -1,56 +1,111 @@
 package com.geun.javaproject.service;
 
-import com.geun.javaproject.dto.EventDTO;
+import com.geun.javaproject.constant.ErrorCode;
+import com.geun.javaproject.constant.EventStatus;
+import com.geun.javaproject.domain.Place;
+import com.geun.javaproject.dto.EventDto;
+import com.geun.javaproject.dto.EventViewResponse;
+import com.geun.javaproject.exception.GeneralException;
 import com.geun.javaproject.repository.EventRepository;
+import com.geun.javaproject.repository.PlaceRepository;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final PlaceRepository placeRepository;
 
-    public List<EventDTO> getEvents(Predicate predicate){
-        return StreamSupport.stream(eventRepository.findAll(predicate).spliterator(), false)
-                .map(EventDTO::of)
-                .toList();
-    }
-
-    public Optional<EventDTO> getEvent(Long eventId) {
-        return eventRepository.findById(eventId).map(EventDTO::of);
-    }
-
-    public boolean createEvent(EventDTO eventDTO) {
-        if (eventDTO == null) {
-            return false;
+    public List<EventDto> getEvents(Predicate predicate) {
+        try {
+            return StreamSupport.stream(eventRepository.findAll(predicate).spliterator(), false)
+                    .map(EventDto::of)
+                    .toList();
+        } catch (Exception e) {
+            throw new GeneralException(ErrorCode.DATA_ACCESS_ERROR, e);
         }
-
-        return true;
     }
 
-    public boolean modifyEvent(Long eventId, EventDTO dto) {
-        if (eventId == null || dto == null) {
-            return false;
+    public Page<EventViewResponse> getEventViewResponse(
+            String placeName,
+            String eventName,
+            EventStatus eventStatus,
+            LocalDateTime eventStartDatetime,
+            LocalDateTime eventEndDatetime,
+            Pageable pageable
+    ) {
+        try {
+            return eventRepository.findEventViewPageBySearchParams(
+                    placeName,
+                    eventName,
+                    eventStatus,
+                    eventStartDatetime,
+                    eventEndDatetime,
+                    pageable
+            );
+        } catch (Exception e) {
+            throw new GeneralException(ErrorCode.DATA_ACCESS_ERROR, e);
         }
+    }
 
-        eventRepository.findById(eventId)
-                .ifPresent(event -> eventRepository.save(dto.updateEntity(event)));
+    public Optional<EventDto> getEvent(Long eventId) {
+        try {
+            return eventRepository.findById(eventId).map(EventDto::of);
+        } catch (Exception e) {
+            throw new GeneralException(ErrorCode.DATA_ACCESS_ERROR, e);
+        }
+    }
 
-        return true;
+    public boolean createEvent(EventDto eventDTO) {
+        try {
+            if (eventDTO == null) {
+                return false;
+            }
+
+            Place place = placeRepository.findById(eventDTO.placeDto().id())
+                    .orElseThrow(() -> new GeneralException(ErrorCode.NOT_FOUND));
+            eventRepository.save(eventDTO.toEntity(place));
+            return true;
+        } catch (Exception e) {
+            throw new GeneralException(ErrorCode.DATA_ACCESS_ERROR, e);
+        }
+    }
+
+    public boolean modifyEvent(Long eventId, EventDto dto) {
+        try {
+            if (eventId == null || dto == null) {
+                return false;
+            }
+
+            eventRepository.findById(eventId)
+                    .ifPresent(event -> eventRepository.save(dto.updateEntity(event)));
+
+            return true;
+        } catch (Exception e) {
+            throw new GeneralException(ErrorCode.DATA_ACCESS_ERROR, e);
+        }
     }
 
     public boolean removeEvent(Long eventId) {
-        if (eventId == null) {
-            return false;
-        }
+        try {
+            if (eventId == null) {
+                return false;
+            }
 
-        eventRepository.deleteById(eventId);
-        return true;
+            eventRepository.deleteById(eventId);
+            return true;
+        } catch (Exception e) {
+            throw new GeneralException(ErrorCode.DATA_ACCESS_ERROR, e);
+        }
     }
 }
