@@ -15,17 +15,7 @@ public record EventViewResponse(
         Integer capacity,
         String memo
 ) {
-    public EventViewResponse(
-            Long id,
-            String placeName,
-            String eventName,
-            EventStatus eventStatus,
-            LocalDateTime eventStartDatetime,
-            LocalDateTime eventEndDatetime,
-            Integer currentNumberOfPeople,
-            Integer capacity,
-            String memo
-    ) {
+    public EventViewResponse(Long id, String placeName, String eventName, EventStatus eventStatus, LocalDateTime eventStartDatetime, LocalDateTime eventEndDatetime, Integer currentNumberOfPeople, Integer capacity, String memo) {
         this.id = id;
         this.placeName = placeName;
         this.eventName = eventName;
@@ -61,18 +51,18 @@ public record EventViewResponse(
         );
     }
 
-    public static EventViewResponse from(EventDto eventDTO) {
-        if (eventDTO == null) { return null; }
+    public static EventViewResponse from(EventDto eventDto) {
+        if (eventDto == null) { return null; }
         return EventViewResponse.of(
-                eventDTO.id(),
-                eventDTO.placeDto().placeName(),
-                eventDTO.eventName(),
-                eventDTO.eventStatus(),
-                eventDTO.eventStartDatetime(),
-                eventDTO.eventEndDatetime(),
-                eventDTO.currentNumberOfPeople(),
-                eventDTO.capacity(),
-                eventDTO.memo()
+                eventDto.id(),
+                eventDto.placeDto().placeName(),
+                eventDto.eventName(),
+                eventDto.eventStatus(),
+                eventDto.eventStartDatetime(),
+                eventDto.eventEndDatetime(),
+                eventDto.currentNumberOfPeople(),
+                eventDto.capacity(),
+                eventDto.memo()
         );
     }
 
