@@ -11,6 +11,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+
 @Getter
 @ToString
 @Table(indexes = {
@@ -38,22 +39,22 @@ public class Event {
     private String eventName;
 
     @Setter
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(20) default 'OPENED'")
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus;
 
     @Setter
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "datetime")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime eventStartDatetime;
 
     @Setter
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "datetime")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime eventEndDatetime;
 
     @Setter
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "integer default 0")
     private Integer currentNumberOfPeople;
 
     @Setter
@@ -65,11 +66,13 @@ public class Event {
     private String memo;
 
 
-    @Column(nullable = false, insertable = false, updatable = false)
+    @Column(nullable = false, insertable = false, updatable = false,
+            columnDefinition = "datetime default CURRENT_TIMESTAMP")
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column(nullable = false, insertable = false, updatable = false)
+    @Column(nullable = false, insertable = false, updatable = false,
+            columnDefinition = "datetime default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP")
     @LastModifiedDate
     private LocalDateTime modifiedAt;
 

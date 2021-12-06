@@ -1,7 +1,6 @@
 package com.geun.javaproject.domain;
 
 import com.geun.javaproject.constant.PlaceType;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -34,7 +33,7 @@ public class Place {
 
 
     @Setter
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(20) default 'COMMON'")
     @Enumerated(EnumType.STRING)
     private PlaceType placeType;
 
@@ -51,7 +50,7 @@ public class Place {
     private String phoneNumber;
 
     @Setter
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "integer default 0")
     private Integer capacity;
 
 
@@ -59,11 +58,13 @@ public class Place {
     private String memo;
 
 
-    @Column(nullable = false, insertable = false, updatable = false)
+    @Column(nullable = false, insertable = false, updatable = false,
+            columnDefinition = "datetime default CURRENT_TIMESTAMP")
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column(nullable = false, insertable = false, updatable = false)
+    @Column(nullable = false, insertable = false, updatable = false,
+            columnDefinition = "datetime default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP")
     @LastModifiedDate
     private LocalDateTime modifiedAt;
 
@@ -75,7 +76,7 @@ public class Place {
 
     @ToString.Exclude
     @OrderBy("id")
-    @OneToMany(mappedBy = "place")
+    @OneToMany(mappedBy = "place", cascade = CascadeType.REMOVE)
     private final Set<AdminPlaceMap> adminPlaceMaps = new LinkedHashSet<>();
 
 
